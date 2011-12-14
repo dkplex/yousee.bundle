@@ -1,3 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site	site = "http://yousee.tv/livetv/.+"
-		plugin="silverlight|http://yousee.tv/design/swf/YouSeeVideoPlayer_beta.swf"/>
+		plugin="silverlight"
+		identifier="com.plexapp.plugins.yousee">
+	<crop x="0" y="0" width="640" height="360" />
+		
+</site>
