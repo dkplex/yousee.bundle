@@ -8,7 +8,6 @@ NAME = L('Title')
 ART  = 'art-default.png'
 ICON = 'icon-default.png'
 LIVE_SOURCE_URL = "http://yousee.tv/feeds/player/livetv/%s"
-API_KEY = 'HCN2BMuByjWnrBF4rUncEfFBMXDumku7nfT3CMnn'
 
 ####################################################################################################
 
@@ -24,23 +23,14 @@ def Start():
     MediaContainer.art = ART
     DirectoryItem.thumb = R(ICON)
     VideoItem.thumb = R(ICON)
-    #HTTP.Headers['User-Agent'] = "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; en-US; rv:1.9.2.13) Gecko/20101203 Firefox/3.6.13"
-    HTTP.Headers['X-API-KEY'] = 'HCN2BMuByjWnrBF4rUncEfFBMXDumku7nfT3CMnn'
+    HTTP.Headers['User-Agent'] = "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; en-US; rv:1.9.2.13) Gecko/20101203 Firefox/3.6.13"
+
     HTTP.CacheTime = CACHE_1HOUR
 def VideoMainMenu():
 
     dir = ObjectContainer(view_group = "List", title1 = NAME, title2 = "Live TV", art = R(ART))
     sources = XML.ElementFromURL(LIVE_SOURCE_URL %'')
 
-    #===========================================================================
-    # For future use
-    # 
-    # json_allowed_channels = JSON.ObjectFromURL('http://api.yousee.tv/rest/livetv/allowed_channels')
-    # json_channel = JSON.ObjectFromURL('http://api.yousee.tv/rest/livetv/streamurl/channel_id/1/client/xbmc')
-    # Log.Debug(json_allowed_channels)
-    # Log.Debug(json_channel)
-    #===========================================================================
-    
     
     for node in sources.xpath('//channel'):
         url = "http://yousee.tv/livetv/%s"
