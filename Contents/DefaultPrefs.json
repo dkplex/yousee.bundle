@@ -1,2 +1,16 @@
 [
+	{	
+		'id'	:	'usr',
+		'label'	:	'Brugernavn:',
+		'type'	:	'text',
+		'default':	''
+		
+	},
+	{
+		'id'	:	'pwd',
+		'label'	:	'Adgangskode',
+		'type'	:	'text',
+		'option':	'hidden',
+		'secure':	'true'
+	}	
 ]
