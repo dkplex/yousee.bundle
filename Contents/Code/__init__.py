@@ -1,5 +1,3 @@
-#from FrameWork import  *
-#import yousee
 import datetime
 
 VIDEO_PREFIX = "/video/yousee"
@@ -45,7 +43,7 @@ def ValidatePrefs():
 		
 def VideoMainMenu():
 	dir = ObjectContainer(view_group = "List", title1 = NAME, title2 = NAME, art = R(ART))
-	dir.add(DirectoryObject(title = "Live TV", key = Callback(Livetv().allowed_channels())))
+	dir.add(DirectoryObject(title = "Live TV", key = Callback(YouseeLiveTVAllowed_channels)))
 	dir.add(PrefsObject(title = 'Indstillinger'))
 	return dir
 
@@ -57,36 +55,31 @@ def VideoMainMenu():
 #   
 #===============================================================================
 
-class Livetv:
-#	def __init__(self):
-#		
-#		pass
-	
-	# Returns metadata for channel based on channel id.
-	def channel(self, id):
-		return JSON.ObjectFromURL(APIURL + 'livetv/channel/id/%s/json' % id)
-	# Returns channels sorted by most popular. 
-	# Based on data from yousee.tv
-	def popularchannels(self):
-		return JSON.ObjectFromURL(APIURL + 'livetv/popularchannels/json')
-	# Returns channels available for streaming from requesting ip address
-#	@route(VIDEO_PREFIX + 'livetv/allowed_channels/{clientip/{branch}/{apiversion}', clientip = '127.0.0.1', branch = 'yousee', apiversion = 2 )
-	def allowed_channels(self, clientip = Network.PublicAddress, branch = 'yousee', apiversion = 2):
-		dir = ObjectContainer(view_group = 'List', title1 = NAME, title2 = 'Live TV', art = R(ART) )
-#		nowandnext = Tvguide().nowandnext()
-#		Log.Debug(nowandnext)
-		for channel in JSON.ObjectFromURL( APIURL + 'livetv/allowed_channels/branch/%s/clientip/%s/apiversion/%s/json' % (branch, clientip, apiversion)):
-			pass
-#			dir.add(VideoClipObject(url = 'http://yousee.tv/livetv/%s' % channel.get('shortname'), title = channel.get('nicename'), thumb = channel['logos'].get('mega') if channel['logos'].get('mega') != "" else channel['logos'].get('super') if channel['logos'].get('super') != ""else channel['logos'].get('extralarge') if channel['logos'].get('extralarge') != "" else channel['logos'].get('large') if channel['logos'].get('large') != "" else channel['logos'].get('small') if channel['logos'] != "" else R(ICON)))
-		return dir
-	#Returns list of channels that should be presented to the user. NOTE: this is not the list of allowed channels.
-	#A non-yousee broadband user will get a list of channels
-	#from “Grundpakken”.
-	def suggested_channels(self):
-		return JSON.ObjectFromURL(APIURL + 'livetv/suggested_channels/json')
-	#Returns absolute streaming URL for channel. Channel rights are based on client ip address.
-	def streamurl(self, channel_id, terminal, drmclientid, session_id, client = 'http', application = 'Plex'):
-		return JSON.ObjectFromURL(APIURL + 'livetv/streamurl/channel_id/%s/client/%s/application/%s/erminal/%s/drmclientid/%s/json' % (channel_id, client, application, terminal, drmclientid), headers = {'X-Yspro':session_id})
+
+# Returns metadata for channel based on channel id.
+def YouseeLiveTVchannel(id):
+	return JSON.ObjectFromURL(APIURL + 'livetv/channel/id/%s/json' % id)
+# Returns channels sorted by most popular. 
+# Based on data from yousee.tv
+def YouseeLiveTVpopularChannels():
+	return JSON.ObjectFromURL(APIURL + 'livetv/popularchannels/json')
+# Returns channels available for streaming from requesting ip address
+def YouseeLiveTVAllowed_channels(clientip = Network.PublicAddress, branch = 'yousee', apiversion = 2):
+	dir = ObjectContainer(view_group = 'List', title1 = NAME, title2 = 'Live TV', art = R(ART) )
+##		nowandnext = Tvguide().nowandnext()
+##		Log.Debug(nowandnext)
+	for channel in JSON.ObjectFromURL( APIURL + 'livetv/allowed_channels/branch/%s/clientip/%s/apiversion/%s/json' % (branch, clientip, apiversion)):
+##		pass
+		dir.add(VideoClipObject(url = 'http://yousee.tv/livetv/%s' % channel.get('shortname'), title = channel.get('nicename'), thumb = channel['logos'].get('mega') if channel['logos'].get('mega') != "" else channel['logos'].get('super') if channel['logos'].get('super') != ""else channel['logos'].get('extralarge') if channel['logos'].get('extralarge') != "" else channel['logos'].get('large') if channel['logos'].get('large') != "" else channel['logos'].get('small') if channel['logos'] != "" else R(ICON)))
+	return dir
+#Returns list of channels that should be presented to the user. NOTE: this is not the list of allowed channels.
+#A non-yousee broadband user will get a list of channels
+#from “Grundpakken”.
+def YouseeLiveTVSuggested_channels():
+	return JSON.ObjectFromURL(APIURL + 'livetv/suggested_channels/json')
+#Returns absolute streaming URL for channel. Channel rights are based on client ip address.
+def YouseeLiveTVStreamurl(channel_id, terminal, drmclientid, session_id, client = 'http', application = 'Plex'):
+	return JSON.ObjectFromURL(APIURL + 'livetv/streamurl/channel_id/%s/client/%s/application/%s/erminal/%s/drmclientid/%s/json' % (channel_id, client, application, terminal, drmclientid), headers = {'X-Yspro':session_id})
 class Movie:
 	# Returns meta data for one movie
 	def movieinfo(self, id,apiversion=2):
