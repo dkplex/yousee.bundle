@@ -1,0 +1,31 @@
+#import re
+
+APPKEY = 'Plex'
+APIKEY = 'qUkcfVVjosq3910c6LSN6pBg0O2XTyjz8kiwUc3L'
+APIURL = 'http://api.yousee.tv/rest/'
+NAME = "YouSee"
+
+def NormalizeURL(url):
+	return url
+
+####################################################################################################
+def MetadataObjectForURL(url):
+	HTTP.Headers['User-Agent'] = "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; en-US; rv:1.9.2.13) Gecko/20101203 Firefox/3.6.13"
+	HTTP.Headers['X-API-KEY'] = APIKEY
+	if 'livetv' in url:
+		vco = VideoClipObject()
+		for allowed_channels in JSON.ObjectFromURL(APIURL + 'livetv/allowed_channels/format/json'):
+			if allowed_channels.get('shortname').lower() ==  url.rsplit('#',1)[0].rsplit('/',1)[1].lower():
+				Log.Debug(allowed_channels)
+				vco.title = allowed_channels.get('nicename')
+				vco.thumb = allowed_channels['logos'].get('mega') if allowed_channels['logos'].get('mega') != "" else allowed_channels['logos'].get('super') if allowed_channels['logos'].get('super') != "" else allowed_channels['logos'].get('extralarge') if allowed_channels['logos'].get('extralarge') != "" else allowed_channels['logos'].get('large') if allowed_channels['logos'].get('large') != "" else allowed_channels['logos'].get('small') if allowed_channels['logos'].get('small') != "" else R(ICON)
+				break
+		return vco
+	
+
+####################################################################################################
+def MediaObjectsForURL(url):
+	HTTP.Headers['User-Agent'] = "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; en-US; rv:1.9.2.13) Gecko/20101203 Firefox/3.6.13"
+	mo = MediaObject()
+	mo.add(PartObject( key = WebVideoURL(url)))
+	return [mo]

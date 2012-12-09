@@ -1,4 +1,6 @@
+#from FrameWork import  *
 #import yousee
+import datetime
 
 VIDEO_PREFIX = "/video/yousee"
 #MUISC_PREFIX = "/music/yousee"
@@ -42,27 +44,24 @@ def ValidatePrefs():
 			Log.Debug('Error')
 		
 def VideoMainMenu():
-    dir = ObjectContainer(view_group = "List", title1 = NAME, title2 = "Live TV", art = R(ART))
-    for channel in Livetv().allowed_channels():
+	dir = ObjectContainer(view_group = "List", title1 = NAME, title2 = NAME, art = R(ART))
+	dir.add(DirectoryObject(title = "Live TV", key = Callback(Livetv().allowed_channels())))
+	dir.add(PrefsObject(title = 'Indstillinger'))
+	return dir
 
-     	#thumb = channel['logos'].get('mega', channel['logos'].get('super', channel['logos'].get('extralarge', channel['logos'].get('large', channel['logos'].get('small, R(ICON')))))
-     	thumb = channel['logos'].get('mega') if channel['logos'].get('mega') != "" else channel['logos'].get('super') if channel['logos'].get('super') != ""else channel['logos'].get('extralarge') if channel['logos'].get('extralarge') != "" else channel['logos'].get('large') if channel['logos'].get('large') != "" else channel['logos'].get('small') if channel['logos'] != "" else R(ICON)
-
-    	Log.Debug(thumb)
-    	dir.add(VideoClipObject(url = 'http://yousee.tv/livetv/%s' % channel.get('shortname'), title = channel.get('nicename'), thumb = thumb))
 	
-#	dir.add(PrefsObject(title = 'Indstillinger', thumb = R(ICON) ))
-    	
-    return dir
 
 #===============================================================================
 #   
-# JSON Calls for Yousee   
+# Yousee API
+#   
 #===============================================================================
 
 class Livetv:
-	def __init__(self):
-		pass
+#	def __init__(self):
+#		
+#		pass
+	
 	# Returns metadata for channel based on channel id.
 	def channel(self, id):
 		return JSON.ObjectFromURL(APIURL + 'livetv/channel/id/%s/json' % id)
@@ -71,8 +70,15 @@ class Livetv:
 	def popularchannels(self):
 		return JSON.ObjectFromURL(APIURL + 'livetv/popularchannels/json')
 	# Returns channels available for streaming from requesting ip address
+#	@route(VIDEO_PREFIX + 'livetv/allowed_channels/{clientip/{branch}/{apiversion}', clientip = '127.0.0.1', branch = 'yousee', apiversion = 2 )
 	def allowed_channels(self, clientip = Network.PublicAddress, branch = 'yousee', apiversion = 2):
-		return JSON.ObjectFromURL( APIURL + 'livetv/allowed_channels/branch/%s/clientip/%s/apiversion/%s/json' % (branch, clientip, apiversion))
+		dir = ObjectContainer(view_group = 'List', title1 = NAME, title2 = 'Live TV', art = R(ART) )
+#		nowandnext = Tvguide().nowandnext()
+#		Log.Debug(nowandnext)
+		for channel in JSON.ObjectFromURL( APIURL + 'livetv/allowed_channels/branch/%s/clientip/%s/apiversion/%s/json' % (branch, clientip, apiversion)):
+			pass
+#			dir.add(VideoClipObject(url = 'http://yousee.tv/livetv/%s' % channel.get('shortname'), title = channel.get('nicename'), thumb = channel['logos'].get('mega') if channel['logos'].get('mega') != "" else channel['logos'].get('super') if channel['logos'].get('super') != ""else channel['logos'].get('extralarge') if channel['logos'].get('extralarge') != "" else channel['logos'].get('large') if channel['logos'].get('large') != "" else channel['logos'].get('small') if channel['logos'] != "" else R(ICON)))
+		return dir
 	#Returns list of channels that should be presented to the user. NOTE: this is not the list of allowed channels.
 	#A non-yousee broadband user will get a list of channels
 	#from “Grundpakken”.
@@ -173,20 +179,43 @@ class Play:
 		return JSON.ObjectFromURL(self, APIURL + 'play/list/json')
 class Tvguide:
 	# Returns all available channels in TV guide, sorted by categories
-	def channels(self):
-		return JSON.ObjectFromURL(APIURL + 'tvguide/channels/json')
+	def channels(self, u= "", m = "", v = ""):
+		url = APIURL + 'tvguide/channels/'
+		if u != "":
+			url += 'u/%s/' % u
+		if m != "":
+			url += 'm/%s/' %m
+		if v != "":
+			url += 'v/%s/' % v
+		url += 'json'
+		meta = JSON.ObjectFromURL(url)
+		return meta
 	# Returns all categories
 	def categories(self):
 		return JSON.ObjectFromURL(APIURL + 'tvguide/categories/json')
 	# Returns programs
-	def programs(self):
-		return JSON.ObjectFromURL(APIURL + 'tvguide/programs/json')
+	def programs(self, channel_id = "", offset = -1, tvdate = datetime.date.today()):
+		url = APIURL + 'tvguide/programs/'
+		if channel_id != "":
+			url += 'channel_id/%s/' % channel_id
+		if offset >= 0:
+			url += 'offset/%s/' % offset
+		if tvdate != datetime.date.today():
+			url += 'tvdate/%s%' % tvdate.strftime('%Y-%m-%d')
+		url += 'json'
+		return JSON.ObjectFromURL(url)
+	# Returns single program
+	def program(self, id):
+		return JSON.ObjectFromURL(APIURL + 'tvguide/program/id&%s/json' % id)
 	# Returns programs matching query
-	def search(self, query):
-		return JSON.ObjectFromURL(APIURL + 'tvguide/search/query/%s/json' % query)
+	def search(self, query, offset = 0, limit = 10):
+		return JSON.ObjectFromURL(APIURL + 'tvguide/search/query/%s/offset/%s/limit/%s/json' % (query, offset, limit))
 	# Returns a list of recommended programs
-	def recommendedprograms(self):
-		return JSON.ObjectFromURL(APIURL + 'tvguide/recommendedprograms/json')
+	def recommendedprograms(self, poplimit = 10, morelimit = 10):
+		return JSON.ObjectFromURL(APIURL + 'tvguide/recommendedprograms/poplimit/%s/morelimit/%s/json' % (poplimit, morelimit))
+	# returns programlist with now and next information for all streamable channels
+	def nowandnext(self):
+		return JSON.ObjectFromURL(APIURL + 'tvguide/nowandnext/json')
 class Archive:
 	#Returns a list of genres
 	def genres(self):
