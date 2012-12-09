@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site	site = "http://yousee.tv/(.*)/.+"
+		plugin="http://yousee.tv/design/swf/YouSeeVideoPlayer_beta.swf"
+		identifier="com.plexapp.plugins.yousee"
+		initialState="playing"
+		version="1.0">
+
+	<!-- SEEKBAR -->
+	<seekbar type="simple">
+		<start x="62" y="408" />
+		<end x="393" y="410" />
+		<played>
+			<color rgb="827f6d" />
+		</played>
+	</seekbar>
+
+	<!-- CROP THE CONTROLS -->
+	<crop x="11" y="3" width="630" height="360" />
+
+	<!-- PLAYING -->
+	<state name="playing">
+		<event>
+			<condition>
+				<command name="stop" />
+			</condition>
+			<action>
+				<click x="212" y="574" />
+				<goto state="stop" />
+			</action>
+		</event>
+	</state>
+
+	<!-- STOPPED -->
+	<state name="stop">
+		<event>
+			<condition>
+				<command name="play" />
+			</condition>
+			<action>
+				<click x="212" y="574" />
+				<goto state="playing" />
+			</action>
+		</event>
+	</state>
+</site>
